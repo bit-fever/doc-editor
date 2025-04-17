@@ -1,0 +1,2 @@
+<router-outlet *ngIf="sessionService.isAuthenticated"/>
+<h1 *ngIf="!sessionService.isAuthenticated">Not authenticated</h1>
