@@ -29,16 +29,32 @@ export class StorageService {
   //---
   //---------------------------------------------------------------------------
 
-  public getTradingSystemDoc = (id:number): Observable<TradingSystemDoc> => {
-    return this.httpService.get<TradingSystemDoc>('/api/storage/v1/trading-systems/'+ id +'/doc');
+  public getTradingSystemDoc = (id:number): Observable<DocumentationResponse> => {
+    return this.httpService.get<DocumentationResponse>('/api/storage/v1/trading-systems/'+ id +'/documentation');
+  }
+
+  //---------------------------------------------------------------------------
+
+  public setTradingSystemDoc = (id:number, doc:string): Observable<void> => {
+    let req = new DocumentationRequest()
+    req.documentation = doc
+
+    return this.httpService.put('/api/storage/v1/trading-systems/'+ id +'/documentation', req);
   }
 }
 
 //=============================================================================
 
-export class TradingSystemDoc {
-  name : string = ""
-  doc  : string = ""
+export class DocumentationRequest {
+  documentation : string = ""
+}
+
+//=============================================================================
+
+export class DocumentationResponse {
+  id            : number = 0
+  name          : string = ""
+  documentation : string = ""
 }
 
 //=============================================================================

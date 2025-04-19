@@ -9,6 +9,9 @@
 import {Component, OnInit} from '@angular/core';
 import {MatToolbarModule} from "@angular/material/toolbar";
 import {MatButtonModule} from "@angular/material/button";
+import {StorageService} from '../service/storage.service';
+import {ActivatedRoute} from '@angular/router';
+import {MatSnackBar} from '@angular/material/snack-bar';
 
 declare var $:any
 
@@ -25,6 +28,14 @@ declare var $:any
 //=============================================================================
 
 export class EditorComponent implements OnInit {
+  //-------------------------------------------------------------------------
+  //---
+  //--- Variables
+  //---
+  //-------------------------------------------------------------------------
+
+  private tsId : number = 0
+  title : string = ""
 
   //-------------------------------------------------------------------------
   //---
@@ -32,7 +43,27 @@ export class EditorComponent implements OnInit {
   //---
   //-------------------------------------------------------------------------
 
-  constructor() {
+  constructor(private route         : ActivatedRoute,
+              private snackBar      : MatSnackBar,
+              private storageService: StorageService) {
+  }
+
+  //-------------------------------------------------------------------------
+  //---
+  //--- Init
+  //---
+  //-------------------------------------------------------------------------
+
+  ngOnInit() {
+    $("#doc-editor").trumbowyg({
+      svgPath: "icons.svg"
+    });
+
+    this.tsId = Number(this.route.snapshot.paramMap.get("id"));
+    this.storageService.getTradingSystemDoc(this.tsId).subscribe( res => {
+      this.title = res.name
+      $('#doc-editor').trumbowyg('html', res.documentation);
+    })
   }
 
   //-------------------------------------------------------------------------
@@ -41,11 +72,12 @@ export class EditorComponent implements OnInit {
   //---
   //-------------------------------------------------------------------------
 
-  ngOnInit() {
-    $("#doc-editor").trumbowyg({
-      svgPath: "icons.svg"
-    });
-//    this.sessionService.checkAuthentication();
+  onSaveClick() {
+    let doc = $('#doc-editor').trumbowyg('html');
+
+    this.storageService.setTradingSystemDoc(this.tsId, doc).subscribe( res => {
+      this.snackBar.open("Documentation saved", undefined, { duration: 3000 })
+    })
   }
 }
 
